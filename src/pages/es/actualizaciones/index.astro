@@ -1,0 +1,31 @@
+---
+import Layout from "../../../ui/Layout.astro";
+import { getCollection } from "astro:content";
+
+const lang = "es";
+const items = (await getCollection("updates")).filter(u => u.data.lang === lang);
+items.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+---
+<Layout lang={lang} title="Actualizaciones">
+  <h1 class="text-2xl font-semibold">Actualizaciones</h1>
+
+  <div class="mt-6 grid gap-4">
+    {items.map((u) => (
+      <a
+        href={`/es/actualizaciones/${u.slug}`}
+        class="block rounded-lg border border-slate-800 bg-slate-900/30 p-5 hover:border-slate-700"
+      >
+        <div class="flex items-center justify-between">
+          <h2 class="text-lg font-semibold">{u.data.title}</h2>
+          <span class="text-xs text-slate-400">{u.data.date.toISOString().slice(0, 10)}</span>
+        </div>
+        <p class="mt-2 text-slate-300">{u.data.summary}</p>
+        <div class="mt-3 flex flex-wrap gap-2">
+          {u.data.tags.slice(0, 6).map((t) => (
+            <span class="text-xs rounded bg-slate-800 px-2 py-1 text-slate-200">{t}</span>
+          ))}
+        </div>
+      </a>
+    ))}
+  </div>
+</Layout>

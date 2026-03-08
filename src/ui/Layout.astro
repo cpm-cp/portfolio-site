@@ -1,0 +1,48 @@
+---
+import "../styles/global.css";
+
+const { lang, title } = Astro.props;
+const isEn = lang === "en";
+const switchTo = isEn ? "es" : "en";
+
+// Mantiene el path al cambiar idioma (/en/... <-> /es/...)
+const parts = Astro.url.pathname.split("/").filter(Boolean);
+if (parts.length === 0) parts.push(lang);
+if (parts[0] === "en" || parts[0] === "es") parts[0] = switchTo;
+else parts.unshift(switchTo);
+const switchUrl = "/" + parts.join("/");
+---
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>{title}</title>
+  </head>
+
+  <body class="min-h-screen bg-slate-950 text-slate-100">
+    <header class="mx-auto max-w-5xl px-6 py-6 flex items-center justify-between">
+      <nav class="flex gap-5 text-slate-200">
+        {isEn ? (
+          <>
+            <a href="/en/projects" class="hover:text-white">Projects</a>
+            <a href="/en/updates" class="hover:text-white">Updates</a>
+          </>
+        ) : (
+          <>
+            <a href="/es/proyectos" class="hover:text-white">Proyectos</a>
+            <a href="/es/actualizaciones" class="hover:text-white">Actualizaciones</a>
+          </>
+        )}
+      </nav>
+
+      <a href={switchUrl} class="text-sm text-slate-300 hover:text-white">
+        {lang.toUpperCase()} → {switchTo.toUpperCase()}
+      </a>
+    </header>
+
+    <main class="mx-auto max-w-5xl px-6 pb-16">
+      <slot />
+    </main>
+  </body>
+</html>

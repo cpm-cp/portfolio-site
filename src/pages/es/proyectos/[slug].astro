@@ -1,0 +1,33 @@
+---
+import Layout from "../../../ui/Layout.astro";
+import { getCollection } from "astro:content";
+
+export async function getStaticPaths() {
+  const all = await getCollection("projects");
+  const es = all.filter(p => p.data.lang === "es");
+  return es.map(p => ({ params: { slug: p.data.slugBase } }));
+}
+
+const { slug } = Astro.params;
+const all = await getCollection("projects");
+const entry = all.find(p => p.data.lang === "es" && p.data.slugBase === slug);
+
+if (!entry) throw new Error(`Proyecto no encontrado: ${slug}`);
+
+const { Content } = await entry.render();
+---
+<Layout lang="es" title={entry.data.title}>
+  <a href="/es/proyectos" class="text-sm text-slate-300 hover:text-white">← Volver a Proyectos</a>
+  <h1 class="mt-4 text-3xl font-semibold">{entry.data.title}</h1>
+  <p class="mt-2 text-slate-300">{entry.data.summary}</p>
+
+  <div class="mt-4 flex flex-wrap gap-2">
+    {entry.data.stack.map((t) => (
+      <span class="text-xs rounded bg-slate-800 px-2 py-1 text-slate-200">{t}</span>
+    ))}
+  </div>
+
+  <div class="mt-6 prose prose-invert max-w-none">
+    <Content />
+  </div>
+</Layout>

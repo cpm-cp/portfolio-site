@@ -4,24 +4,34 @@ import { getCollection } from "astro:content";
 
 export async function getStaticPaths() {
   const all = await getCollection("updates");
-  const es = all.filter(u => u.data.lang === "es");
-  return es.map(u => ({ params: { slug: u.slug } }));
+  const es = all.filter((u) => u.data.lang === "es");
+  return es.map((u) => ({ params: { slug: u.slug } }));
 }
 
-const { slug } = Astro.params;
+const slug = Astro.params.slug!;
 const all = await getCollection("updates");
-const entry = all.find(u => u.data.lang === "es" && u.slug === slug);
+const entry = all.find((u) => u.data.lang === "es" && u.slug === slug);
 if (!entry) throw new Error(`Actualización no encontrada: ${slug}`);
 
 const { Content } = await entry.render();
 ---
+
 <Layout lang="es" title={entry.data.title}>
-  <a href="/es/actualizaciones" class="text-sm text-slate-300 hover:text-white">← Volver a Actualizaciones</a>
+  <a href="/es/actualizaciones" class="text-sm text-slate-300 hover:text-white">
+    ← Volver a Actualizaciones
+  </a>
+
   <h1 class="mt-4 text-3xl font-semibold">{entry.data.title}</h1>
   <p class="mt-2 text-slate-300">{entry.data.summary}</p>
 
   <div class="mt-6 text-sm text-slate-400">
-    {entry.data.date.toISOString().slice(0, 10)} • Proyecto: {entry.data.slugBase}
+    {entry.data.date.toISOString().slice(0, 10)} • Proyecto:
+    <a
+      href={`/es/proyectos/${entry.data.slugBase}`}
+      class="text-slate-200 hover:text-white underline underline-offset-4"
+    >
+      {entry.data.slugBase}
+    </a>
   </div>
 
   <div class="mt-6">

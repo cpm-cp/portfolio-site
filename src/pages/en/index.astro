@@ -1,10 +1,58 @@
 ---
 import Layout from "../../ui/Layout.astro";
+import { getCollection } from "astro:content";
+
 const lang = "en";
+const updates = (await getCollection("updates"))
+  .filter((u) => u.data.lang === lang)
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  .slice(0, 5); // muestra 5
 ---
+
 <Layout lang={lang} title="Portfolio">
   <h1 class="text-3xl font-semibold">Portfolio</h1>
   <p class="mt-2 text-slate-300">
-    Bilingual portfolio (EN default, ES localized routes).
+    I build engineering tools and educational apps. Here are my latest updates.
   </p>
+
+  <section class="mt-10">
+    <div class="flex items-end justify-between">
+      <h2 class="text-xl font-semibold">Latest updates</h2>
+      <a href="/en/updates" class="text-sm text-slate-300 hover:text-white">View all →</a>
+    </div>
+
+    <div class="mt-4 grid gap-4">
+      {updates.map((u) => (
+        <a
+          href={`/en/updates/${u.slug}`}
+          class="block rounded-lg border border-slate-800 bg-slate-900/30 p-5 hover:border-slate-700"
+        >
+          <div class="flex items-center justify-between gap-4">
+            <h3 class="text-lg font-semibold">{u.data.title}</h3>
+            <span class="shrink-0 text-xs text-slate-400">
+              {u.data.date.toISOString().slice(0, 10)}
+            </span>
+          </div>
+
+          <p class="mt-2 text-slate-300">{u.data.summary}</p>
+
+          <div class="mt-3 text-xs text-slate-400">
+            Project: <span class="text-slate-200">{u.data.slugBase}</span>
+          </div>
+
+          <div class="mt-3 flex flex-wrap gap-2">
+            {u.data.tags?.slice(0, 6).map((t) => (
+              <span class="text-xs rounded bg-slate-800 px-2 py-1 text-slate-200">{t}</span>
+            ))}
+          </div>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <div class="mt-10">
+    <a href="/en/projects" class="text-sm text-slate-300 hover:text-white">
+      Browse projects →
+    </a>
+  </div>
 </Layout>
